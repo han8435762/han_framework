@@ -1,0 +1,14 @@
+<{include file="Public/header.html"}>
+    <div>
+        <a style="float:right;" class="btn btn-primary" href="javascript:void(0);" onclick="add_user();">添加</a>
+    </div>
+    <div id="user_list">
+        <{include file="User/list.html"}>
+    </div>
+    <div class="pagination pagination-centered">
+        <ul>
+        <{$pages}>
+        </ul>
+    </div>
+</div>
+<{include file="Public/footer.html"}>

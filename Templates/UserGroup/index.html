@@ -1,0 +1,157 @@
+<{include file="Public/header.html"}>
+            <div>
+                <span class="label label-warning"><strong>注意：</strong>只有超级管理员才能够进行增删改的操作</span>
+                <{if $is_super_admin}>
+                <a style="float:right;" class="btn btn-primary" href="javascript:void(0);" onclick="add_group();">添加</a>
+                <{/if}>
+            </div>
+            <div>
+                <table class="table">
+                    <tr>
+                        <th>ID</th><th>组名</th><th>描述</th><th>权限</th><th>添加时间</th><th>操作</th>
+                    </tr>
+                    <{foreach from="$groups" key="key" item="item"}>
+                    <tr>
+                        <td><{$item.group_id}></td>
+                        <td><{$item.group_name}></td>
+                        <td><{$item.description}></td>
+                        <td>
+                            <input type="checkbox" disabled="disabled" <{if $item.allow_add}>checked="checked"<{/if}> />增
+                            <input type="checkbox" disabled="disabled" <{if $item.allow_delete}>checked="checked"<{/if}> />删
+                            <input type="checkbox" disabled="disabled" <{if $item.allow_edit}>checked="checked"<{/if}> />改
+                            <input type="checkbox" disabled="disabled" <{if $item.allow_select}>checked="checked"<{/if}> />查
+                        </td>
+                        <td><{$item.add_time|date_format:"%Y-%m-%d %H:%I:%S"}></td>
+                        <{if $is_super_admin}>
+                        <td><a data-group-id="<{$item.group_id}>" data-group-name="<{$item.group_name}>" id="edit_<{$item.group_id}>" data-description="<{$item.description}>" data-allow-add="<{$item.allow_add}>" data-allow-delete="<{$item.allow_delete}>" data-allow-edit="<{$item.allow_edit}>" data-allow-select="<{$item.allow_select}>" href="javascript:void(0);" onclick="edit_group(this.id);" >编辑</a>|<a href="javascript:void(0);" onclick="delete_group(<{$item.group_id}>);">删除</a></td>
+                        <{else}>
+                        <td>编辑|删除</td>
+                        <{/if}>
+                    </tr>
+                    <{/foreach}>
+                </table>
+            </div>
+        </div>
+        <{if $is_super_admin}>
+        <form action="<{$smarty.const.ROOT_DOMAIN}>/?c=user_group&a=add" id="modal_form" method="POST" target="inner_iframe">
+            <input type="hidden" name="iframe_callback" id="iframe_callback" value="handle_result"/>
+            <input type="hidden" name="group_id" id="group_id" value="" />
+            <div id="add_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 id="modal_label">添加用户组</h3>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tr>
+                            <td>用户组名称：</td><td><input type="text" name="group_name" id="group_name"/></td>
+                        </tr>
+                        <tr>
+                            <td>用户组描述：</td><td><input type="text" name="description" id="description"/></td>
+                        </tr>
+                        <tr>
+                            <td>权限：</td>
+                            <td>
+                                <input type="checkbox" id="allow_add" name="allow_add"/>增
+                                <input type="checkbox" id="allow_delete" name="allow_delete"/>删
+                                <input type="checkbox" id="allow_edit" name="allow_edit"/>改
+                                <input type="checkbox" id="allow_select" name="allow_select"/>查
+                            </td>
+                        </tr>
+                    </table>
+                    <span class="label label-warning" id="notice"></span>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="submit" />
+                </div>
+            </div>
+        </form>
+
+        <iframe style="display:none;" name="inner_iframe"></iframe>
+        <script>
+            function handle_result(json_string) {
+                var json_obj = eval("(" + json_string + ")");
+                if (json_obj.result) {
+                    $('#notice').attr('class', 'label label-success');
+                    $('#notice').html('提交成功');
+                    setTimeout(function () {window.location.reload();},500);
+                } else {
+                    $('#notice').attr('class', 'label label-warning');
+                    $('#notice').html(json_obj.message);
+                }
+            }
+
+            function add_group() {
+
+                $('#group_id').val('');
+                $('#group_name').val('');
+                $('#description').val('');
+                $('#allow_add').attr('checked', false);
+                $('#allow_delete').attr('checked', false);
+                $('#allow_edit').attr('checked', false);
+                $('#allow_select').attr('checked', false);
+
+                $('#modal_label').html('添加用户组');
+                $('#modal_form').attr('action', '<{$smarty.const.ROOT_DOMAIN}>/?c=user_group&a=add');
+                $('#add_modal').modal('toggle');
+            }
+
+            function edit_group(id) {
+                var obj = $('#' + id);
+                var group_id = obj.attr('data-group-id');
+                var group_name = obj.attr('data-group-name');
+                var description = obj.attr('data-description');
+                var allow_add = parseInt(obj.attr('data-allow-add'));
+                var allow_delete = parseInt(obj.attr('data-allow-delete'));
+                var allow_edit = parseInt(obj.attr('data-allow-edit'));
+                var allow_select = parseInt(obj.attr('data-allow-select'));
+
+                $('#group_id').val(group_id);
+                $('#group_name').val(group_name);
+                $('#description').val(description);
+
+                if (allow_add) {
+                    $('#allow_add').attr('checked', true);
+                } else {
+                    $('#allow_add').attr('checked', false);
+                }
+
+                if (allow_delete) {
+                    $('#allow_delete').attr('checked', true);
+                } else {
+                    $('#allow_delete').attr('checked', false);
+                }
+
+                if (allow_edit) {
+                    $('#allow_edit').attr('checked', true);
+                } else {
+                    $('#allow_edit').attr('checked', false);
+                }
+
+                if (allow_select) {
+                    $('#allow_select').attr('checked', true);
+                } else {
+                    $('#allow_select').attr('checked', false);
+                }
+
+                $('#modal_label').html('编辑用户组');
+                $('#modal_form').attr('action', '<{$smarty.const.ROOT_DOMAIN}>/?c=user_group&a=edit');
+                $('#add_modal').modal('toggle');
+            }
+
+            function delete_group(group_id) {
+                if (confirm('是否要删除该组以及改组下的所有成员？')) {
+                    $.post('<{$smarty.const.ROOT_DOMAIN}>/?c=user_group&a=delete', {group_id:group_id}, function(json_string) {
+                        var json_obj = eval("(" + json_string + ")");
+                        if (json_obj.result) {
+                            alert('删除成功');
+                            window.location.reload();
+                        } else {
+                            alert(json_obj.message);
+                        }
+                    });
+                }
+            }
+        </script>
+        <{/if}>
+<{include file="Public/footer.html"}>

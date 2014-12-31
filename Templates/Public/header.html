@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <link type="text/css" rel="stylesheet" href="<{$smarty.const.CSS_DOMAIN}>/bootstrap.css" />
+        <script src="<{$smarty.const.JS_DOMAIN}>/jquery.min.js"></script>
+        <script src="<{$smarty.const.JS_DOMAIN}>/bootstrap.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div style="margin-top:5px;">
+                <span style="float:right;">您好, <{$logged_user.user_name}> | <a href="<{$smarty.const.ROOT_DOMAIN}>/?c=user&a=logout">退出</a></span>
+            </div>
+
+            <ul class="nav nav-pills">
+              <li <{if $smarty.const.CONTROLLER_NAME == "User"}>class="active"<{/if}>>
+                <a href="<{$smarty.const.ROOT_DOMAIN}>/?c=user&a=index">用户列表</a>
+              </li>
+              <li <{if $smarty.const.CONTROLLER_NAME == "UserGroup"}>class="active"<{/if}>><a href="<{$smarty.const.ROOT_DOMAIN}>/?c=user_group&a=index">用户组列表</a></li>
+            </ul>
